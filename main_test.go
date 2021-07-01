@@ -30,4 +30,13 @@ func TestCreating(test *testing.T) {
 	}
 
 	request.Header.Set("Content-Type", "application/json")
+
+	client := http.Client{}
+	response, err := client.Do(request)
+	if err != nil {
+		test.Logf("unable to send the request: %s", err)
+		test.FailNow()
+	}
+
+	response = response
 }
