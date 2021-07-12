@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"testing"
 )
@@ -37,6 +38,24 @@ func TestCreating(test *testing.T) {
 		test.Logf("unable to send the request: %s", err)
 		test.FailNow()
 	}
+	defer response.Body.Close()
 
-	response = response
+	responseBytes, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		test.Logf("unable to read the response: %s", err)
+		test.FailNow()
+	}
+
+	type createdPost struct {
+		ID int
+	}
+
+	createdPostInstance := createdPost{}
+	err = json.Unmarshal(responseBytes, &createdPostInstance)
+	if err != nil {
+		test.Logf("unable to unmarshal the response: %s", err)
+		test.FailNow()
+	}
+
+	test.Logf("post ID: %d", createdPostInstance.ID)
 }
