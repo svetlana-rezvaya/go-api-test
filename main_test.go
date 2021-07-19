@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"testing"
@@ -57,5 +58,40 @@ func TestCreating(test *testing.T) {
 		test.FailNow()
 	}
 
-	test.Logf("post ID: %d", createdPostInstance.ID)
+	// getting the model
+	gettingURL :=
+		fmt.Sprintf("http://localhost:3000/posts/%d", createdPostInstance.ID)
+	request, err = http.NewRequest(http.MethodGet, gettingURL, nil)
+	if err != nil {
+		test.Logf("unable to create the request: %s", err)
+		test.FailNow()
+	}
+
+	response, err = client.Do(request)
+	if err != nil {
+		test.Logf("unable to send the request: %s", err)
+		test.FailNow()
+	}
+	defer response.Body.Close()
+
+	responseBytes, err = ioutil.ReadAll(response.Body)
+	if err != nil {
+		test.Logf("unable to read the response: %s", err)
+		test.FailNow()
+	}
+
+	type receivedPost struct {
+		ID      int
+		Title   string
+		Content string
+	}
+
+	receivedPostInstance := receivedPost{}
+	err = json.Unmarshal(responseBytes, &receivedPostInstance)
+	if err != nil {
+		test.Logf("unable to unmarshal the response: %s", err)
+		test.FailNow()
+	}
+
+	test.Logf("post: %+v", receivedPostInstance)
 }
