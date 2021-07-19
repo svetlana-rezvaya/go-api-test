@@ -93,5 +93,20 @@ func TestCreating(test *testing.T) {
 		test.FailNow()
 	}
 
-	test.Logf("post: %+v", receivedPostInstance)
+	if receivedPostInstance.Title != postInstance.Title {
+		test.Logf(
+			"the title is incorrect: expected - %s; actual - %s",
+			postInstance.Title,
+			receivedPostInstance.Title,
+		)
+		test.Fail()
+	}
+	if receivedPostInstance.Content != postInstance.Content {
+		test.Logf(
+			"the content is incorrect: expected - %s; actual - %s",
+			postInstance.Content,
+			receivedPostInstance.Content,
+		)
+		test.Fail()
+	}
 }
